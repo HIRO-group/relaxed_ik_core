@@ -1,5 +1,6 @@
 use nalgebra;
 use nalgebra::{Vector3, Vector6, UnitQuaternion, Unit, Matrix, DMatrix, DVector, ArrayStorage};
+use num::clamp;
 
 #[derive(Clone, Debug)]
 pub struct Arm {
@@ -241,6 +242,7 @@ impl Arm{
                 jacobian.set_column(joint_idx, & Vector6::new( linear.x, linear.y, linear.z,
                                                                     p_axis.x, p_axis.y, p_axis.z ));
 
+
                 joint_idx += 1;
             }
         }
@@ -249,8 +251,14 @@ impl Arm{
     }
 
     pub fn get_manipulability_immutable(&self, x: &[f64]) -> f64 {
+        if self.num_dof < 6 {
+            return 0.0;
+        }
+
         let jacobian = self.get_jacobian_immutable(x);
-        (jacobian.clone() * jacobian.transpose()).determinant().sqrt()
+        let mut d = (jacobian.clone() * jacobian.transpose()).determinant();
+        d = clamp(d, 0.0, 1.0);
+        d.sqrt()
     }
 
     pub fn get_ee_pos_and_quat_immutable(&self, x: &[f64]) -> (nalgebra::Vector3<f64>, nalgebra::UnitQuaternion<f64>) {
