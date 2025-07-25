@@ -34,7 +34,7 @@ pub fn groove_loss(x_val: f64, t: f64, d: i32, c: f64, f: f64, g: i32) -> f64 {
 }
 
 pub fn groove_loss_derivative(x_val: f64, t: f64, d: i32, c: f64, f: f64, g: i32) -> f64 {
-    -( (-(x_val - t).powi(d)) / (2.0 * c.powi(2) ) ).exp() *  ((-d as f64 * (x_val - t)) /  (2.0 * c.powi(2))) + g as f64 * f * (x_val - t)
+    -( (-(x_val - t).powi(d)) / (2.0 * c.powi(2) ) ).exp() *  ((-d as f64 * (x_val - t)) /  (2.0 * c.powi(2))) + g as f64 * f * (x_val - t).powi(g - 1)
 }
 // HIRO funnly swamp loss
 // 1. x_val
@@ -342,6 +342,9 @@ impl EachJointLimits {
 impl ObjectiveTrait for EachJointLimits {
     fn call(&self, x: &[f64], v: &vars::RelaxedIKVars, frames: &Vec<(Vec<nalgebra::Vector3<f64>>, Vec<nalgebra::UnitQuaternion<f64>>)>) -> f64 {
     
+        if v.robot.lower_joint_limits[self.joint_idx] == -999.0 && v.robot.upper_joint_limits[self.joint_idx] == 999.0 {
+            return -1.0;
+        }
         let l = v.robot.lower_joint_limits[self.joint_idx];
         let u = v.robot.upper_joint_limits[self.joint_idx];
         swamp_loss(x[self.joint_idx], l, u, 10.0, 10.0, 20)

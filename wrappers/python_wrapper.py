@@ -18,13 +18,14 @@ lib.solve.restype = Opt
 lib.solve_position.argtypes = [ctypes.POINTER(RelaxedIKS), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int]
 lib.solve_position.restype = Opt
 lib.solve_velocity.argtypes = [ctypes.POINTER(RelaxedIKS), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int]
-lib.solve_velocity.restype = Opt
+lib.solve_velocity.restype = Opt  
 lib.hiro_solve_velocity.argtypes = [ctypes.POINTER(RelaxedIKS), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int, 
                                     ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.POINTER(ctypes.c_double), ctypes.c_int,
                                     ctypes.POINTER(ctypes.c_double), ctypes.c_int,
                                     ctypes.POINTER(ctypes.c_double), ctypes.c_int,
                                     ctypes.POINTER(ctypes.c_double), ctypes.c_int]
 lib.hiro_solve_velocity.restype = Opt
+lib.reset.argtypes = [ctypes.POINTER(RelaxedIKS)]
 
 class RelaxedIKRust:
     def __init__(self, setting_file_path = None):
@@ -80,6 +81,7 @@ class RelaxedIKRust:
         xopt = lib.solve_velocity(self.obj, linear_arr, len(linear_arr), angular_arr, len(angular_arr), tole_arr, len(tole_arr))
         return xopt.data[:xopt.length]
     
+
     def hiro_solve_velocity(self, linear_velocities, quat_goal, tolerances, quat_line, cone_params, x_a, x_g, x_hist, y_hist, z_hist):
         '''
         Assuming the robot has N end-effectors
@@ -125,6 +127,12 @@ class RelaxedIKRust:
                                        cone_params_arr, len(cone_params_arr), x_a_arr, len(x_a_arr), x_g_arr, len(x_g_arr),
                                        x_hist_arr, len(x_hist_arr), y_hist_arr, len(y_hist_arr), z_hist_arr, len(z_hist_arr))
         return xopt.data[:xopt.length]
+
+    def reset(self, joint_state):
+        js_arr = (ctypes.c_double * len(joint_state))()
+        for i in range(len(joint_state)):
+            js_arr[i] = joint_state[i]
+        lib.reset(self.obj, js_arr, len(js_arr))
 
 if __name__ == '__main__':
     pass
