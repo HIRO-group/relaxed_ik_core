@@ -43,6 +43,9 @@ We provide a series of wrappers for our tools to be used in various platform or 
  and [ROS 2 wrapper](https://github.com/uwgraphics/relaxed_ik_ros2).
 [`relaxed_ik_ros1/scripts/relaxed_ik_rust.py`](https://github.com/uwgraphics/relaxed_ik_ros1/blob/ranged-ik/scripts/relaxed_ik_rust.py) provides an example of using the python wrapper.
 
+### C++ wrapper
+`cpp/relaxed_ik.hpp` exposes a small RAII style interface for C++ programs. Build the Rust library as a shared library and link against `librelaxed_ik_lib` when compiling your C++ application. `cpp/example.cpp` demonstrates basic usage of the wrapper.
+
 ### JavaScript (WebAssembly) wrapper
 [Online demo](https://yepw.github.io/relaxed-ik-web-demo/)
 1. [Install Rust](https://www.rust-lang.org/tools/install) 
